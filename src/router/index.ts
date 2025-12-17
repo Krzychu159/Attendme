@@ -18,6 +18,12 @@ const router = createRouter({
         return "/login";
       },
     },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "NotFound",
+      component: () => import("../pages/NotFound.vue"),
+    },
+
     { path: "/teacher", component: Teacher, meta: { requiresAuth: true } },
     { path: "/student", component: Student, meta: { requiresAuth: true } },
   ],
