@@ -1,8 +1,11 @@
 <template>
-  <div class="p-4">
-    <h2 class="text-xl font-semibold mb-3">Panel studenta</h2>
-    <p>Tu pojawi się lista obecności</p>
+  <Menu />
+  <div class="max-w-[1240px] mx-auto">
+    <Dashboard />
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Dashboard from "../components/shared/dashboard.vue";
+import Menu from "../components/shared/Menu.vue";
+</script>
