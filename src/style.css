@@ -6,3 +6,10 @@ body {
   width: 100%;
   overflow-x: hidden;
 }
+input,
+select,
+textarea {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}

@@ -6,6 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import Dashboard from "../components/shared/dashboard.vue";
+import Dashboard from "../components/shared/Dashboard.vue";
 import Menu from "../components/shared/Menu.vue";
 </script>
