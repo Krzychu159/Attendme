@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useCourseSessionStore } from "../../store/CourseSession";
+import { useCourseSessionStore } from "@/store/courseSession";
 import { computed } from "vue";
 
 const props = defineProps<{
