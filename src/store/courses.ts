@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { getStudentSessions } from "../api/course";
+import { useAuthStore } from "./auth";
 
 export const useCoursesStore = defineStore("courses", {
   state: () => ({
@@ -14,31 +15,23 @@ export const useCoursesStore = defineStore("courses", {
         this.loading = true;
         this.error = "";
 
-        const data = await getStudentSessions();
-        console.log("📦 Odpowiedź backendu:", data);
+        const auth = useAuthStore();
+        if (!auth.user) await auth.fetchUser();
 
-        if (!data || !Array.isArray(data) || data.length === 0) {
-          console.warn("Brak kursów, dodajemy mock testowy...");
-          this.courses = [
-            {
-              id: 1,
-              courseName: "Programowanie w Vue 3",
-              teacherName: "Jan Kowalski",
-              date: "2025-12-21 10:00",
-            },
-            {
-              id: 2,
-              courseName: "Bazy danych",
-              teacherName: "Anna Nowak",
-              date: "2025-12-22 08:00",
-            },
-          ];
-        } else {
-          this.courses = data;
+        const studentId = auth.user?.studentId;
+        if (!studentId) {
+          this.error = "Brak ID studenta.";
+          return;
         }
+
+        const data = await getStudentSessions(studentId);
+        console.log("📦 API response:", data);
+
+        this.courses = Array.isArray(data?.items) ? data.items : [];
+        console.log("✅ courses zapisane:", this.courses.length);
       } catch (err: any) {
-        console.error("fetchCourses error:", err);
-        this.error = "Nie udało się pobrać kursów.";
+        console.error("❌ fetchCourses error:", err);
+        this.error = "Nie udało się pobrać zajęć.";
       } finally {
         this.loading = false;
       }
