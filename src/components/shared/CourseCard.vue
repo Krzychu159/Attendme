@@ -1,5 +1,6 @@
 <template>
   <div
+    @click="goToCourse"
     class="flex flex-col gap-2 border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition-shadow"
   >
     <div
@@ -41,7 +42,21 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { useRouter } from "vue-router";
+
+const props = defineProps<{
   course: any;
 }>();
+
+const router = useRouter();
+
+const goToCourse = () => {
+  router.push({
+    name: "CoursePage",
+    params: {
+      sessionId: props.course.courseSessionId,
+      groupId: props.course.courseGroupId,
+    },
+  });
+};
 </script>
