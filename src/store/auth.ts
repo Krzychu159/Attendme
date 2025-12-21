@@ -19,7 +19,16 @@ export const useAuthStore = defineStore("auth", {
     async fetchUser() {
       const userData = await getCurrentUser();
       this.user = userData;
-      this.role = userData.role || "student";
+
+      if (userData.isTeacher) {
+        this.role = "teacher";
+      } else if (userData.isStudent) {
+        this.role = "student";
+      } else {
+        this.role = "guest";
+      }
+
+      console.log("👤 Zalogowany użytkownik:", this.role, this.user);
     },
 
     logout() {

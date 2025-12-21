@@ -1,8 +1,11 @@
 <template>
-  <div class="p-4">
-    <h2 class="text-xl font-semibold mb-3">Panel wykładowcy</h2>
-    <p>Tu pojawi się lista zajęć.</p>
+  <Menu />
+  <div class="max-w-[1240px] mx-auto">
+    <TeacherDashboard />
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TeacherDashboard from "../components/teacher/TeacherDashboard.vue";
+import Menu from "../components/shared/Menu.vue";
+</script>
