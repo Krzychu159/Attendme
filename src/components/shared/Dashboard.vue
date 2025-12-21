@@ -1,6 +1,7 @@
 <template>
   <div class="mx-10">
     <Filters />
+
     <div v-if="loading">Ładowanie kursów...</div>
     <div v-else-if="error" class="text-red-600">{{ error }}</div>
 
@@ -23,7 +24,8 @@
               hour: "2-digit",
               minute: "2-digit",
             })
-          }}–
+          }}
+          –
           {{
             new Date(course.dateEnd).toLocaleTimeString("pl-PL", {
               hour: "2-digit",
@@ -33,10 +35,7 @@
         </div>
 
         <div class="flex justify-between">
-          <h2 class="font-semibold text-lg">
-            {{ course.courseName }}
-          </h2>
-
+          <h2 class="font-semibold text-lg">{{ course.courseName }}</h2>
           <p class="text-gray-500 text-sm">{{ course.locationName }}</p>
         </div>
         <div class="text-gray-500 text-sm">
@@ -53,16 +52,17 @@
 import { onMounted } from "vue";
 import { useCoursesStore } from "../../store/courses";
 import { useAuthStore } from "../../store/auth";
+import { storeToRefs } from "pinia";
 import Filters from "./Filters.vue";
 
 const coursesStore = useCoursesStore();
 const auth = useAuthStore();
+
+const { courses, loading, error } = storeToRefs(coursesStore);
 
 onMounted(async () => {
   if (!auth.token) return;
   await new Promise((r) => setTimeout(r, 100));
   await coursesStore.fetchCourses();
 });
-
-const { courses, loading, error } = coursesStore;
 </script>
