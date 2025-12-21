@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-10">
+  <div class="mx-5">
     <Filters />
 
     <CourseList :courses="courses" :loading="loading" :error="error" />

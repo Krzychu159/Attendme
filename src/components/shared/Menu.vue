@@ -3,9 +3,14 @@
     <nav
       class="flex list-none justify-between max-w-[1240px] mx-auto p-10 items-center max-h-24"
     >
-      <li>
-        <img src="/logo-noname.png" alt="Logo" class="w-16 mx-auto mb-4" />
-      </li>
+      <RouterLink
+        :to="auth.role === 'teacher' ? '/teacher' : '/student'"
+        class="text-red-500 cursor-pointer hover:underline"
+      >
+        <li>
+          <img src="/logo-noname.png" alt="Logo" class="w-16 mx-auto mb-4" />
+        </li>
+      </RouterLink>
 
       <div ref="dropdownRef" class="relative">
         <li
