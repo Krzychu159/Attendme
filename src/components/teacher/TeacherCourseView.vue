@@ -6,14 +6,18 @@
   </div>
 
   <div v-else-if="session">
-    <h1 class="text-xl font-bold mb-4">
+    <h1 class="text-xl font-bold mb-3">
       {{ session.courseName }}
     </h1>
 
-    <p class="mb-4">
-      {{ formattedDate }} | {{ formattedStartTime }} – {{ formattedEndTime }} |
-      {{ session.locationName }}
-    </p>
+    <div class="flex flex-col gap-3 mb-10">
+      <p><b>Termin</b> {{ formattedDate }}</p>
+      <p>
+        <b>Godziny</b>
+        {{ formattedStartTime }} – {{ formattedEndTime }}
+      </p>
+      <p><b>Lokalizacja</b> {{ session.locationName }}</p>
+    </div>
 
     <h2 class="font-semibold mb-2">Lista studentów</h2>
 
@@ -23,6 +27,7 @@
           <th class="p-2 text-left">Student</th>
           <th class="p-2 text-left">Album</th>
           <th class="p-2 text-left">Obecność</th>
+          <th class="p-2 text-left">Akcja</th>
         </tr>
       </thead>
 
@@ -37,6 +42,13 @@
               {{ s.wasUserPresent ? "Obecny" : "Nieobecny" }}
             </span>
           </td>
+          <td>
+            <button
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+            >
+              Zaznacz obecność
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -46,9 +58,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, watch, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCourseSessionStore } from "@/store/courseSession";
+import { useTeacherCoursesStore } from "@/store/courses";
 
 const props = defineProps<{
   sessionId: number;
@@ -58,22 +71,25 @@ const props = defineProps<{
 const store = useCourseSessionStore();
 const { session, students, loading, error } = storeToRefs(store);
 
-// 🔥 STABILNIE: reagujemy na sessionId
+const teacherCoursesStore = useTeacherCoursesStore();
+const didPrefetch = ref(false);
+
 watch(
   () => props.sessionId,
-  (id) => {
+  async (id) => {
     if (!id || Number.isNaN(id)) return;
 
-    // 1️⃣ dane sesji z listy nauczyciela
-    store.setSessionFromTeacherCourses(id, props.groupId);
+    if (!teacherCoursesStore.courses.length && !didPrefetch.value) {
+      didPrefetch.value = true;
+      await teacherCoursesStore.fetchCourses();
+    }
 
-    // 2️⃣ lista obecności z backendu
+    store.setSessionFromTeacherCourses(id, props.groupId);
     store.fetchAttendanceList(id);
   },
   { immediate: true }
 );
 
-// ---- FORMATOWANIE ----
 const formattedDate = computed(() =>
   session.value
     ? new Date(session.value.dateStart).toLocaleDateString("pl-PL")

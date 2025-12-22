@@ -4,7 +4,7 @@
       {{ session.courseName }}
     </h1>
 
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-3 mb-10">
       <p><b>Termin</b> {{ formattedDate }}</p>
       <p>
         <b>Godziny</b>
