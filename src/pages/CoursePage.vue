@@ -1,5 +1,6 @@
 <template>
   <Menu />
+  <div v-if="!authReady">Ładowanie...</div>
   <div class="max-w-[1240px] mx-auto my-5">
     <div class="mx-10">
       <component
@@ -27,4 +28,5 @@ const sessionId = Number(route.params.sessionId);
 const groupId = Number(route.params.groupId);
 
 const isTeacher = computed(() => auth.role === "teacher");
+const authReady = computed(() => !!auth.role);
 </script>

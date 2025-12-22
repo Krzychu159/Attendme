@@ -5,25 +5,24 @@
     </h1>
 
     <div class="flex flex-col gap-3">
-      <p><span class="font-bold">Termin</span> {{ formattedDate }}</p>
+      <p><b>Termin</b> {{ formattedDate }}</p>
       <p>
-        <span class="font-bold">Godziny</span> {{ formattedStartTime }} –
-        {{ formattedEndTime }}
+        <b>Godziny</b>
+        {{ formattedStartTime }} – {{ formattedEndTime }}
       </p>
-      <p>
-        <span class="font-bold">Lokalizacja</span> {{ session.locationName }}
-      </p>
+      <p><b>Lokalizacja</b> {{ session.locationName }}</p>
     </div>
   </div>
 
-  <div v-else class="text-gray-500">Nie znaleziono sesji.</div>
+  <div v-else class="text-gray-500">Brak danych sesji.</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { computed, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useCourseSessionStore } from "@/store/courseSession";
-import { computed } from "vue";
+import { useCoursesStore } from "@/store/courses";
+import { useAuthStore } from "@/store/auth";
 
 const props = defineProps<{
   sessionId: number;
@@ -31,38 +30,65 @@ const props = defineProps<{
 }>();
 
 const courseSessionStore = useCourseSessionStore();
+const coursesStore = useCoursesStore();
+const auth = useAuthStore();
+
 const { session } = storeToRefs(courseSessionStore);
 
-onMounted(() => {
-  courseSessionStore.setSessionFromList(props.sessionId, props.groupId);
+const trySetSessionFromCourses = () => {
+  const found = coursesStore.courses.find(
+    (c: any) =>
+      c.courseSessionId === props.sessionId && c.courseGroupId === props.groupId
+  );
+
+  if (found) {
+    courseSessionStore.setSession(found);
+  }
+};
+
+onMounted(async () => {
+  if (!coursesStore.courses.length) {
+    if (auth.token && !auth.user) {
+      await auth.fetchUser();
+    }
+
+    await coursesStore.fetchCourses();
+  }
+
+  trySetSessionFromCourses();
 });
 
 watch(
-  () => [props.sessionId, props.groupId],
-  ([s, g]) => {
-    if (s == null || g == null) return;
-    courseSessionStore.setSessionFromList(s, g);
-  }
+  () => [props.sessionId, props.groupId, coursesStore.courses.length],
+  () => {
+    if (!props.sessionId || Number.isNaN(props.sessionId)) return;
+    if (!coursesStore.courses.length) return;
+    trySetSessionFromCourses();
+  },
+  { immediate: true }
 );
 
-const formattedDate = computed(() => {
-  if (!session.value) return "";
-  return new Date(session.value.dateStart).toLocaleDateString("pl-PL");
-});
+const formattedDate = computed(() =>
+  session.value
+    ? new Date(session.value.dateStart).toLocaleDateString("pl-PL")
+    : ""
+);
 
-const formattedStartTime = computed(() => {
-  if (!session.value) return "";
-  return new Date(session.value.dateStart).toLocaleTimeString("pl-PL", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-});
+const formattedStartTime = computed(() =>
+  session.value
+    ? new Date(session.value.dateStart).toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : ""
+);
 
-const formattedEndTime = computed(() => {
-  if (!session.value) return "";
-  return new Date(session.value.dateEnd).toLocaleTimeString("pl-PL", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-});
+const formattedEndTime = computed(() =>
+  session.value
+    ? new Date(session.value.dateEnd).toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : ""
+);
 </script>

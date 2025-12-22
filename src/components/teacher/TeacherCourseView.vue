@@ -1,68 +1,100 @@
 <template>
-  <div v-if="session">
-    <h1 class="text-xl font-bold mb-3">
+  <div v-if="loading">Ładowanie...</div>
+
+  <div v-else-if="error" class="text-red-500">
+    {{ error }}
+  </div>
+
+  <div v-else-if="session">
+    <h1 class="text-xl font-bold mb-4">
       {{ session.courseName }}
     </h1>
 
-    <div class="flex flex-col gap-3">
-      <p><span class="font-bold">Termin</span> {{ formattedDate }}</p>
-      <p>
-        <span class="font-bold">Godziny</span> {{ formattedStartTime }} –
-        {{ formattedEndTime }}
-      </p>
-      <p>
-        <span class="font-bold">Lokalizacja</span> {{ session.locationName }}
-      </p>
-    </div>
+    <p class="mb-4">
+      {{ formattedDate }} | {{ formattedStartTime }} – {{ formattedEndTime }} |
+      {{ session.locationName }}
+    </p>
+
+    <h2 class="font-semibold mb-2">Lista studentów</h2>
+
+    <table class="w-full border text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="p-2 text-left">Student</th>
+          <th class="p-2 text-left">Album</th>
+          <th class="p-2 text-left">Obecność</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr v-for="s in students" :key="s.attenderUserId" class="border-t">
+          <td class="p-2">{{ s.userName }} {{ s.userSurname }}</td>
+          <td class="p-2">
+            {{ s.studentAlbumIdNumber }}
+          </td>
+          <td class="p-2">
+            <span :class="s.wasUserPresent ? 'text-green-600' : 'text-red-600'">
+              {{ s.wasUserPresent ? "Obecny" : "Nieobecny" }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <div v-else class="text-gray-500">Nie znaleziono sesji.</div>
+  <div v-else class="text-gray-500">Brak danych sesji.</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useCourseSessionStore } from "@/store/courseSession";
-import { computed } from "vue";
 
 const props = defineProps<{
   sessionId: number;
   groupId: number;
 }>();
 
-const courseSessionStore = useCourseSessionStore();
-const { session } = storeToRefs(courseSessionStore);
+const store = useCourseSessionStore();
+const { session, students, loading, error } = storeToRefs(store);
 
-onMounted(() => {
-  courseSessionStore.setSessionFromList(props.sessionId, props.groupId);
-});
-
+// 🔥 STABILNIE: reagujemy na sessionId
 watch(
-  () => [props.sessionId, props.groupId],
-  ([s, g]) => {
-    if (s == null || g == null) return;
-    courseSessionStore.setSessionFromList(s, g);
-  }
+  () => props.sessionId,
+  (id) => {
+    if (!id || Number.isNaN(id)) return;
+
+    // 1️⃣ dane sesji z listy nauczyciela
+    store.setSessionFromTeacherCourses(id, props.groupId);
+
+    // 2️⃣ lista obecności z backendu
+    store.fetchAttendanceList(id);
+  },
+  { immediate: true }
 );
 
-const formattedDate = computed(() => {
-  if (!session.value) return "";
-  return new Date(session.value.dateStart).toLocaleDateString("pl-PL");
-});
+// ---- FORMATOWANIE ----
+const formattedDate = computed(() =>
+  session.value
+    ? new Date(session.value.dateStart).toLocaleDateString("pl-PL")
+    : ""
+);
 
-const formattedStartTime = computed(() => {
-  if (!session.value) return "";
-  return new Date(session.value.dateStart).toLocaleTimeString("pl-PL", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-});
+const formattedStartTime = computed(() =>
+  session.value
+    ? new Date(session.value.dateStart).toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : ""
+);
 
-const formattedEndTime = computed(() => {
-  if (!session.value) return "";
-  return new Date(session.value.dateEnd).toLocaleTimeString("pl-PL", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-});
+const formattedEndTime = computed(() =>
+  session.value
+    ? new Date(session.value.dateEnd).toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : ""
+);
 </script>
