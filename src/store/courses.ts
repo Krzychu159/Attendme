@@ -65,9 +65,9 @@ export const useTeacherCoursesStore = defineStore("teacherCourses", {
         console.log("📦 Teacher API response:", data);
 
         this.courses = Array.isArray(data?.items) ? data.items : [];
-        console.log("✅ Teacher courses:", this.courses.length);
+        console.log(" Teacher courses:", this.courses.length);
       } catch (err: any) {
-        console.error("❌ fetchCourses (teacher) error:", err);
+        console.error(" fetchCourses (teacher) error:", err);
         this.error = "Nie udało się pobrać zajęć wykładowcy.";
       } finally {
         this.loading = false;

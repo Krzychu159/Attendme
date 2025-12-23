@@ -6,17 +6,27 @@
   </div>
 
   <div v-else-if="session">
-    <h1 class="text-xl font-bold mb-3">
-      {{ session.courseName }}
-    </h1>
+    <div class="md:flex justify-between">
+      <div>
+        <h1 class="text-xl font-bold mb-3">
+          {{ session.courseName }}
+        </h1>
 
-    <div class="flex flex-col gap-3 mb-10">
-      <p><b>Termin</b> {{ formattedDate }}</p>
-      <p>
-        <b>Godziny</b>
-        {{ formattedStartTime }} – {{ formattedEndTime }}
-      </p>
-      <p><b>Lokalizacja</b> {{ session.locationName }}</p>
+        <div class="flex flex-col gap-3 mb-10">
+          <p><b>Termin</b> {{ formattedDate }}</p>
+          <p>
+            <b>Godziny</b>
+            {{ formattedStartTime }} – {{ formattedEndTime }}
+          </p>
+          <p><b>Lokalizacja</b> {{ session.locationName }}</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-5 mb-8 md:mb-0">
+        <button class="bg-blue-500 border-blue-500 text-white">
+          Skaner obecności
+        </button>
+        <button>Rejestracja urządzenia</button>
+      </div>
     </div>
 
     <h2 class="font-semibold mb-2">Lista studentów</h2>
