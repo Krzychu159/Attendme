@@ -54,7 +54,14 @@
           </td>
           <td>
             <button
+              class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded"
+              v-if="s.wasUserPresent"
+            >
+              Odznacz obecność
+            </button>
+            <button
               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+              v-else
             >
               Zaznacz obecność
             </button>

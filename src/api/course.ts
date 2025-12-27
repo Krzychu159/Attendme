@@ -1,7 +1,13 @@
 import { api } from "./client";
 
-export async function getStudentSessions(studentId: number) {
-  const res = await api.post("/course/student/sessions/get", { studentId });
+export async function getStudentSessions() {
+  const body = {
+    pageNumber: 1,
+    pageSize: 999999,
+    filters: {},
+  };
+
+  const res = await api.post("/course/student/sessions/get", body);
   return res.data;
 }
 

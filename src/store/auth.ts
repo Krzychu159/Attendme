@@ -27,8 +27,6 @@ export const useAuthStore = defineStore("auth", {
       } else {
         this.role = "guest";
       }
-
-      console.log("👤 Zalogowany użytkownik:", this.role, this.user);
     },
 
     logout() {

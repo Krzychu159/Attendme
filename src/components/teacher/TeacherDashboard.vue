@@ -1,6 +1,6 @@
 <template>
   <div class="mx-5">
-    <Filters />
+    <Filters :store="teacherCoursesStore" />
 
     <CourseList :courses="courses" :loading="loading" :error="error" />
   </div>
@@ -16,7 +16,9 @@ import CourseList from "../shared/CourseList.vue";
 
 const teacherCoursesStore = useTeacherCoursesStore();
 const auth = useAuthStore();
-const { courses, loading, error } = storeToRefs(teacherCoursesStore);
+
+const { filteredCourses, loading, error } = storeToRefs(teacherCoursesStore);
+const courses = filteredCourses;
 
 onMounted(async () => {
   if (!auth.token) return;
