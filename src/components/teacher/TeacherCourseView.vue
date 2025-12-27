@@ -56,12 +56,26 @@
             <button
               class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded"
               v-if="s.wasUserPresent"
+              @click="
+                toogleAttendance(
+                  s.attenderUserId,
+                  session.courseSessionId,
+                  false
+                )
+              "
             >
               Odznacz obecność
             </button>
             <button
               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
               v-else
+              @click="
+                toogleAttendance(
+                  s.attenderUserId,
+                  session.courseSessionId,
+                  true
+                )
+              "
             >
               Zaznacz obecność
             </button>
@@ -90,6 +104,14 @@ const { session, students, loading, error } = storeToRefs(store);
 
 const teacherCoursesStore = useTeacherCoursesStore();
 const didPrefetch = ref(false);
+
+const toogleAttendance = (
+  studentId: number,
+  courseSessionId: number,
+  addOrRemove: boolean
+) => {
+  store.toogleAttendance(studentId, courseSessionId, addOrRemove);
+};
 
 watch(
   () => props.sessionId,

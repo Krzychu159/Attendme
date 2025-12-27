@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { getSessionAttendanceList } from "@/api/course";
 import { useTeacherCoursesStore } from "@/store/courses";
+import { toogleAttendance as toogleAttendanceApi } from "@/api/attendance";
 
 export const useCourseSessionStore = defineStore("courseSession", {
   state: () => ({
@@ -46,6 +47,29 @@ export const useCourseSessionStore = defineStore("courseSession", {
       this.session = null;
       this.students = [];
       this.error = null;
+    },
+
+    async toogleAttendance(
+      studentId: number,
+      courseSessionId: number,
+      addOrRemove: boolean
+    ) {
+      try {
+        this.loading = true;
+        this.error = null;
+
+        await toogleAttendanceApi(studentId, courseSessionId, addOrRemove);
+
+        const student = this.students.find(
+          (s) => s.attenderUserId === studentId
+        );
+        if (!student) return;
+        student.wasUserPresent = addOrRemove;
+      } catch (e) {
+        this.error = "Nie udało się zaktualizować obecności studenta";
+      } finally {
+        this.loading = false;
+      }
     },
   },
 });
