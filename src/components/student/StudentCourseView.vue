@@ -43,6 +43,31 @@
       </div>
     </div>
   </div>
+
+  <div class="flex flex-col gap-3 mb-5">
+    <div>
+      <b>Frekwencja dotychczasowa:</b> {{ attendanceStore.totalAttendance }} z
+      {{ coursesStore.courses.length }} ({{ attendancePercent }}%)
+    </div>
+    <div class="w-full bg-gray-300 h-8 rounded-2xl">
+      <div
+        class="bg-green-500 h-8 rounded-2xl bg-gradient-to-r from-green-400 to-green-600"
+        :style="{ width: attendancePercent + '%' }"
+      ></div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-3 mb-5">
+    <div>
+      <b>Zaawansowanie kursu:</b> {{ past }} z {{ total }} ({{ progress }}%)
+    </div>
+    <div class="w-full bg-gray-300 h-8 rounded-2xl">
+      <div
+        class="bg-blue-500 h-8 rounded-2xl bg-gradient-to-r from-blue-400 to-blue-600"
+        :style="{ width: progress + '%' }"
+      ></div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -75,6 +100,24 @@ const trySetSessionFromCourses = () => {
     courseSessionStore.setSession(found);
   }
 };
+
+//frekwencja i postep kursu
+
+const past = coursesStore.courses.filter(
+  (c) => new Date(c.dateStart) < new Date()
+).length;
+const total = coursesStore.courses.length;
+
+const progress = computed(() => {
+  return total ? Math.round((past / total) * 100) : 0;
+});
+
+const attendancePercent = computed(() => {
+  const attended = attendanceStore.totalAttendance;
+  return total ? Math.round((attended / total) * 100) : 0;
+});
+
+//inicjalizacja danych
 
 onMounted(async () => {
   if (!coursesStore.courses.length) {
