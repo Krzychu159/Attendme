@@ -6,9 +6,12 @@
 
     <div class="flex justify-between gap-4">
       <select v-model="range">
+        <option value="today">Dziś</option>
         <option value="week">Bieżący tydzień</option>
         <option value="month">Bieżący miesiąc</option>
-        <option value="year">Bieżący rok</option>
+        <option value="future">Przyszłe</option>
+        <option value="all">Wszystkie</option>
+        <option value="past">Minione</option>
       </select>
 
       <input
