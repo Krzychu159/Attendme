@@ -4,7 +4,7 @@
   >
     <h2>Filtry</h2>
 
-    <div class="flex justify-between gap-4">
+    <div class="flex justify-between gap-4 w-full">
       <select v-model="range">
         <option value="today">Dziś</option>
         <option value="week">Bieżący tydzień</option>
@@ -17,8 +17,8 @@
       <input
         v-model="query"
         type="text"
-        placeholder="Przedmiot, lokalizacja"
-        class="w-fit"
+        placeholder="Przedmiot, sala"
+        class="md:w-fit w-full"
       />
     </div>
   </div>

@@ -22,3 +22,10 @@ export async function toogleAttendance(
 
   return res.data;
 }
+
+export async function getScannerToken(sessionId: number) {
+  const res = await api.get("/course/session/attendance/scanner/token/get", {
+    params: { sessionId },
+  });
+  return res.data;
+}

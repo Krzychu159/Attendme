@@ -97,10 +97,10 @@
       <!-- SCANNER -->
       <div
         v-if="openScanner"
-        class="absolute top-40 left-1/2 -translate-x-1/2 bg-white border p-4 rounded shadow-lg flex flex-col gap-4"
+        class="absolute top-20 left-1/2 -translate-x-1/2 bg-white border p-4 rounded shadow-lg flex flex-col"
       >
         <div class="flex justify-between items-center border-b pb-2">
-          <div class="font-bold">Skaner obescności</div>
+          <div class="font-bold">Skaner obecności</div>
           <div
             class="cursor-pointer text-2xl"
             @click.self="
@@ -111,17 +111,44 @@
             &times;
           </div>
         </div>
-        <div>
-          Do sprawdzania obecności wymagane jest urządzenie wyposażone w kamerę
-          (tablet lub telefon). Zeskanuj na nim poniższy kod QR lub otwórz adres
-          url, który możesz skopiować poniższym przyciskiem. Sprawdzenie
-          obecności polega na umieszczeniu w polu widzenia kamery skanera kodu
-          QR wygnerowanego na ekranie telefonu uczestnika.
+
+        <div class="my-4 text-gray-700">
+          <p>
+            Do sprawdzania obecności wymagane jest urządzenie wyposażone w
+            kamerę (tablet lub telefon). Zeskanuj na nim poniższy kod QR lub
+            otwórz adres url, który możesz skopiować poniższym przyciskiem.
+            Sprawdzenie obecności polega na umieszczeniu w polu widzenia kamery
+            skanera kodu QR wygnerowanego na ekranie telefonu uczestnika.
+          </p>
         </div>
-        <div>Kod QR</div>
-        <button class="bg-blue-500 border-blue-500 text-white">
-          Skopiuj Link
-        </button>
+
+        <div class="flex flex-col items-center gap-4">
+          <div v-if="store.loading">Generowanie kodu QR...</div>
+          <div v-else-if="store.error" class="text-red-600">
+            {{ store.error }}
+          </div>
+          <img
+            v-else-if="store.qrUrl"
+            :src="store.qrUrl"
+            alt="Kod QR"
+            class="w-64 h-64"
+          />
+          <button
+            v-if="store.url"
+            class="bg-blue-500 text-white px-4 py-2 rounded"
+            @click="copyLink"
+          >
+            {{ copied ? "Skopiowano ✓" : "Skopiuj link" }}
+          </button>
+
+          <button
+            v-if="!store.qrUrl"
+            class="bg-blue-500 text-white px-4 py-2 rounded"
+            @click="store.generateQrForSession"
+          >
+            Generuj QR
+          </button>
+        </div>
       </div>
     </div>
 
@@ -231,6 +258,19 @@ watch(
   },
   { immediate: true }
 );
+
+const copied = ref(false);
+
+const copyLink = async () => {
+  if (!store.url) return;
+
+  await navigator.clipboard.writeText(store.url);
+  copied.value = true;
+
+  setTimeout(() => {
+    copied.value = false;
+  }, 1500);
+};
 
 const formattedDate = computed(() =>
   session.value

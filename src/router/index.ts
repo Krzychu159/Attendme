@@ -34,6 +34,11 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: "/scanner",
+      name: "Scanner",
+      component: () => import("@/pages/Scanner.vue"),
+    },
   ],
 });
 

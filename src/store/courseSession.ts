@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { getSessionAttendanceList } from "@/api/course";
 import { useTeacherCoursesStore } from "@/store/courses";
 import { toogleAttendance as toogleAttendanceApi } from "@/api/attendance";
+import { getScannerToken } from "@/api/attendance";
+import QRCode from "qrcode";
 
 export const useCourseSessionStore = defineStore("courseSession", {
   state: () => ({
@@ -9,6 +11,8 @@ export const useCourseSessionStore = defineStore("courseSession", {
     students: [] as any[],
     loading: false,
     error: null as string | null,
+    qrUrl: null as string | null,
+    url: null as string | null,
   }),
 
   actions: {
@@ -67,6 +71,29 @@ export const useCourseSessionStore = defineStore("courseSession", {
         student.wasUserPresent = addOrRemove;
       } catch (e) {
         this.error = "Nie udało się zaktualizować obecności studenta";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async generateQrForSession() {
+      if (!this.session) {
+        this.error = "Brak sesji do wygenerowania QR kodu.";
+        return null;
+      }
+      try {
+        this.loading = true;
+        this.error = null;
+
+        const tokenData = await getScannerToken(this.session.courseSessionId);
+
+        const url = `${window.location.origin}/scanner?token=${tokenData.token}`;
+
+        this.qrUrl = await QRCode.toDataURL(url);
+        this.url = url;
+      } catch (e) {
+        this.error = "Nie udało się wygenerować QR kodu.";
+        return null;
       } finally {
         this.loading = false;
       }
