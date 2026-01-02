@@ -10,6 +10,7 @@
       Aby zarejestorwać obecność umieść telefon w polu widzenia skanera. W razie
       wątpliwości poproś osobę prowadzącą zajęcia o pomoc.
     </div>
+    <div>token: {{ token }}</div>
   </div>
 </template>
 <script setup lang="ts">
