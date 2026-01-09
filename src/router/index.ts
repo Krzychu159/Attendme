@@ -39,6 +39,11 @@ const router = createRouter({
       name: "Scanner",
       component: () => import("@/pages/Scanner.vue"),
     },
+    {
+      path: "/device/register",
+      name: "DeviceRegister",
+      component: () => import("@/pages/DeviceRegister.vue"),
+    },
   ],
 });
 

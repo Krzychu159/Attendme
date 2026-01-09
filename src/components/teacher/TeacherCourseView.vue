@@ -46,7 +46,7 @@
       <!-- REGISTER -->
       <div
         v-if="openRegister"
-        class="absolute top-8 left-1/2 -translate-x-1/2 bg-white border p-4 rounded shadow-lg"
+        class="absolute top-8 left-1/2 -translate-x-1/2 bg-white border p-4 rounded shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto"
       >
         <div class="flex justify-between items-center border-b pb-2 mb-5">
           <div class="font-bold">Rejestracja urządzenia</div>
@@ -82,10 +82,16 @@
                 {{ s.studentAlbumIdNumber }}
               </td>
               <td class="p-2">
-                <div>brak</div>
+                {{
+                  userStore.userInfos[s.attenderUserId]?.deviceName || "brak"
+                }}
               </td>
+
               <td class="p-2">
-                <button class="bg-blue-500 border-blue-500 text-white">
+                <button
+                  class="bg-blue-500 border-blue-500 text-white"
+                  @click="copyDeviceLink(s)"
+                >
                   Skopiuj Link
                 </button>
               </td>
@@ -220,6 +226,8 @@ import { computed, watch, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCourseSessionStore } from "@/store/courseSession";
 import { useTeacherCoursesStore } from "@/store/courses";
+import { useUserStore } from "@/store/user";
+import { useDeviceStore } from "@/store/device";
 
 const props = defineProps<{
   sessionId: number;
@@ -241,6 +249,46 @@ const toogleAttendance = (
   addOrRemove: boolean
 ) => {
   store.toogleAttendance(studentId, courseSessionId, addOrRemove);
+};
+
+const userStore = useUserStore();
+watch(
+  students,
+  async (newStudents) => {
+    if (!newStudents.length) return;
+
+    const ids = newStudents.map((s) => s.attenderUserId);
+    await userStore.fetchUsersByIds(ids);
+  },
+  { immediate: true }
+);
+
+const deviceStore = useDeviceStore();
+watch(
+  students,
+  async (newStudents) => {
+    if (!newStudents.length) return;
+
+    const ids = newStudents.map((s) => s.attenderUserId);
+    await deviceStore.fetchTokensByIds(ids);
+  },
+  { immediate: true }
+);
+
+const copyDeviceLink = async (student: any) => {
+  let token = deviceStore.deviceTokens[student.attenderUserId];
+
+  if (!token) {
+    token = await deviceStore.generateRegisterToken(student);
+    if (!token) {
+      alert("Nie udało się uzyskać tokena rejestracyjnego dla studenta.");
+      return;
+    }
+  }
+
+  const url = `${window.location.origin}/device/register?token=${token}`;
+  await navigator.clipboard.writeText(url);
+  alert("✅ Skopiowano link rejestracyjny!");
 };
 
 watch(

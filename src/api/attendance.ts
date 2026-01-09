@@ -14,8 +14,8 @@ export async function toogleAttendance(
 ) {
   const res = await api.get("/course/session/attendance/toggle", {
     params: {
-      attendingUserId, // ⬅️ MUSI się tak nazywać
-      courseSessionId, // ⬅️ MUSI być
+      attendingUserId,
+      courseSessionId,
       addOrRemove,
     },
   });
