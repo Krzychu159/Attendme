@@ -278,14 +278,6 @@ watch(
 const copyDeviceLink = async (student: any) => {
   let token = deviceStore.deviceTokens[student.attenderUserId];
 
-  if (!token) {
-    token = await deviceStore.generateRegisterToken(student);
-    if (!token) {
-      alert("Nie udało się uzyskać tokena rejestracyjnego dla studenta.");
-      return;
-    }
-  }
-
   const url = `${window.location.origin}/device/register?token=${token}`;
   await navigator.clipboard.writeText(url);
   alert("✅ Skopiowano link rejestracyjny!");

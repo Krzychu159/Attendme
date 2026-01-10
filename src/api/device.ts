@@ -8,13 +8,31 @@ export async function getDeviceToken(deviceUserId: number) {
   return res.data; // { token, expires }
 }
 
-// Generuje nowy token rejestracyjny dla urządzenia (POST /user/device/register)
-export async function registerDeviceForStudent(data: {
-  deviceName: string;
-  studentName: string;
-  studentSurname: string;
-  albumIdNumber: number;
-}) {
-  const res = await api.post("/user/device/register", data);
+// Generuje nowy token rejestracyjny dla urządzenia
+export async function registerDeviceForStudent(
+  token: string,
+  data: {
+    deviceName: string;
+    studentName: string;
+    studentSurname: string;
+    albumIdNumber: number;
+  }
+) {
+  const res = await api.post("/user/device/register", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data; // { token, expires }
+}
+
+// Resetuje zarejestrowane urządzenie
+export async function resetDevice(deviceUserId: number, deviceToken: string) {
+  const res = await api.post("/user/device/reset", null, {
+    params: { deviceUserId },
+    headers: {
+      Authorization: `Bearer ${deviceToken}`,
+    },
+  });
+  return res.data;
 }

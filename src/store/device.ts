@@ -1,4 +1,8 @@
-import { getDeviceToken, registerDeviceForStudent } from "@/api/device";
+import {
+  getDeviceToken,
+  registerDeviceForStudent,
+  resetDevice,
+} from "@/api/device";
 import { defineStore } from "pinia";
 
 export const useDeviceStore = defineStore("device", {
@@ -9,7 +13,7 @@ export const useDeviceStore = defineStore("device", {
   }),
 
   actions: {
-    // Pobiera istniejące tokeny dla listy studentów (jeśli urządzenie już zarejestrowane)
+    // Pobiera istniejące tokeny dla listy studentów
     async fetchTokensByIds(ids: number[]) {
       this.loading = true;
       this.error = null;
@@ -31,35 +35,62 @@ export const useDeviceStore = defineStore("device", {
       }
     },
 
-    // Generuje nowy token rejestracyjny, jeśli student nie ma jeszcze urządzenia
-    async generateRegisterToken(student: {
-      attenderUserId: number;
-      userName: string;
-      userSurname: string;
-      studentAlbumIdNumber: number;
-    }) {
+    // Rejestruje własne urządzenie studenta i zwraca token rejestracyjny
+    async registerDeviceWithToken(
+      token: string,
+      data: {
+        deviceName: string;
+        studentName: string;
+        studentSurname: string;
+        albumIdNumber: number;
+      }
+    ) {
       this.loading = true;
       this.error = null;
 
       try {
-        const res = await registerDeviceForStudent({
-          deviceName: "Telefon studenta",
-          studentName: student.userName,
-          studentSurname: student.userSurname,
-          albumIdNumber: student.studentAlbumIdNumber,
-        });
+        const res = await registerDeviceForStudent(token, data);
 
         if (res?.token) {
-          this.deviceTokens[student.attenderUserId] = res.token;
-          return res.token;
+          localStorage.setItem("deviceToken", res.token);
         }
-      } catch (e) {
-        this.error = "Nie udało się wygenerować tokena rejestracyjnego.";
+
+        return res;
+      } catch (err: any) {
+        this.error =
+          err.response?.data?.detail ||
+          "Nie udało się zarejestrować urządzenia.";
+        throw err;
       } finally {
         this.loading = false;
       }
+    },
 
-      return null;
+    // Resetuje zarejestrowane urządzenie studenta
+    async resetRegisteredDevice() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const token = localStorage.getItem("deviceToken");
+        const userIdStr = localStorage.getItem("deviceUserId");
+
+        if (!token || !userIdStr)
+          throw new Error("Brak danych urządzenia do resetu.");
+
+        const deviceUserId = Number(userIdStr);
+
+        await resetDevice(deviceUserId, token);
+
+        localStorage.removeItem("deviceToken");
+        localStorage.removeItem("deviceUserId");
+      } catch (err: any) {
+        this.error =
+          err.response?.data?.detail || "Nie udało się zresetować urządzenia.";
+        throw err;
+      } finally {
+        this.loading = false;
+      }
     },
   },
 });
