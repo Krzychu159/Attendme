@@ -82,9 +82,15 @@
                 {{ s.studentAlbumIdNumber }}
               </td>
               <td class="p-2">
-                {{
-                  userStore.userInfos[s.attenderUserId]?.deviceName || "brak"
-                }}
+                {{ userStore.userInfos[s.attenderUserId]?.deviceName || "---" }}
+                <div v-if="userStore.userInfos[s.attenderUserId]?.deviceName">
+                  <div
+                    class="text-red-500 hover:underline cursor-pointer"
+                    @click="resetDevice(s.attenderUserId)"
+                  >
+                    Delete
+                  </div>
+                </div>
               </td>
 
               <td class="p-2">
@@ -251,6 +257,18 @@ const toogleAttendance = (
   store.toogleAttendance(studentId, courseSessionId, addOrRemove);
 };
 
+const resetDevice = async (studentId: number) => {
+  try {
+    await deviceStore.resetStudentDevice(studentId);
+    if (userStore.userInfos[studentId]) {
+      userStore.userInfos[studentId].deviceName = null;
+    }
+    alert("✅ Urządzenie zostało zresetowane pomyślnie.");
+  } catch (err) {
+    alert("❌ Nie udało się zresetować urządzenia.");
+  }
+};
+
 const userStore = useUserStore();
 watch(
   students,
@@ -280,7 +298,6 @@ const copyDeviceLink = async (student: any) => {
 
   const url = `${window.location.origin}/device/register?token=${token}`;
   await navigator.clipboard.writeText(url);
-  alert("✅ Skopiowano link rejestracyjny!");
 };
 
 watch(

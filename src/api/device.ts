@@ -27,12 +27,9 @@ export async function registerDeviceForStudent(
 }
 
 // Resetuje zarejestrowane urządzenie
-export async function resetDevice(deviceUserId: number, deviceToken: string) {
+export async function resetDevice(deviceUserId: number) {
   const res = await api.post("/user/device/reset", null, {
     params: { deviceUserId },
-    headers: {
-      Authorization: `Bearer ${deviceToken}`,
-    },
   });
   return res.data;
 }

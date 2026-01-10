@@ -99,11 +99,9 @@ const surname = ref("");
 const index = ref("");
 const success = ref(false);
 
-// 🔹 Pokazuj "ekran z przyciskami" tylko jeśli jesteśmy NA STRONIE REJESTRACJI
 onMounted(() => {
   const registered = localStorage.getItem("deviceRegistered");
 
-  // sprawdzamy że to faktycznie strona /device/register
   const isDeviceRegisterPage = route.path.includes("/device/register");
 
   if (isDeviceRegisterPage && registered === "true") {
@@ -141,7 +139,6 @@ const resetDevice = async () => {
   try {
     await deviceStore.resetRegisteredDevice();
 
-    // 🔹 czyścimy lokalne dane
     localStorage.removeItem("deviceToken");
     localStorage.removeItem("deviceUserId");
     localStorage.removeItem("deviceRegistered");

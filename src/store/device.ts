@@ -72,22 +72,39 @@ export const useDeviceStore = defineStore("device", {
       this.error = null;
 
       try {
-        const token = localStorage.getItem("deviceToken");
-        const userIdStr = localStorage.getItem("deviceUserId");
+        const deviceUserId = localStorage.getItem("deviceUserId");
 
-        if (!token || !userIdStr)
-          throw new Error("Brak danych urządzenia do resetu.");
+        if (!deviceUserId) {
+          this.error = "Brak deviceUserId w pamięci lokalnej.";
+          return;
+        }
 
-        const deviceUserId = Number(userIdStr);
+        await resetDevice(Number(deviceUserId));
 
-        await resetDevice(deviceUserId, token);
-
+        // 🔹 Czyścimy wszystko lokalnie
         localStorage.removeItem("deviceToken");
         localStorage.removeItem("deviceUserId");
-      } catch (err: any) {
-        this.error =
-          err.response?.data?.detail || "Nie udało się zresetować urządzenia.";
-        throw err;
+        localStorage.removeItem("deviceRegistered");
+      } catch (e) {
+        console.error("Błąd podczas resetowania urządzenia:", e);
+        this.error = "Nie udało się zresetować urządzenia.";
+      } finally {
+        this.loading = false;
+      }
+    },
+    // Resetuje urządzenie studenta o podanym ID (używane przez nauczyciela)
+    async resetStudentDevice(studentId: number) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        await resetDevice(studentId);
+
+        // 🔹 Po sukcesie usuń token z lokalnego cache (żeby tabela się odświeżyła)
+        delete this.deviceTokens[studentId];
+      } catch (e) {
+        console.error("Błąd resetowania urządzenia:", e);
+        this.error = "Nie udało się zresetować urządzenia studenta.";
       } finally {
         this.loading = false;
       }
