@@ -38,7 +38,6 @@ const router = createRouter({
       path: "/scanner/:sessionId",
       name: "Scanner",
       component: () => import("@/pages/Scanner.vue"),
-      meta: { requiresAuth: true },
     },
 
     {
