@@ -35,7 +35,7 @@ const router = createRouter({
       },
     },
     {
-      path: "/scanner/:sessionId",
+      path: "/scanner",
       name: "Scanner",
       component: () => import("@/pages/Scanner.vue"),
     },

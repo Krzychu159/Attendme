@@ -43,3 +43,12 @@ export async function getAttendanceTicket() {
     expires: string;
   };
 }
+
+// Rejestracja obecności po zeskanowaniu QR
+export async function registerAttendance(attenderToken: string) {
+  const res = await api.post("/course/session/attendance/register", {
+    attenderToken,
+  });
+
+  return res.data; // User
+}

@@ -81,14 +81,13 @@ export const useCourseSessionStore = defineStore("courseSession", {
         this.error = "Brak sesji do wygenerowania QR kodu.";
         return null;
       }
-
       try {
         this.loading = true;
         this.error = null;
 
-        await getScannerToken(this.session.courseSessionId);
+        const tokenData = await getScannerToken(this.session.courseSessionId);
 
-        const url = `${window.location.origin}/scanner/${this.session.courseSessionId}`;
+        const url = `${window.location.origin}/scanner?token=${tokenData.token}`;
 
         this.qrUrl = await QRCode.toDataURL(url);
         this.url = url;
