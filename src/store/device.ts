@@ -92,6 +92,7 @@ export const useDeviceStore = defineStore("device", {
         this.loading = false;
       }
     },
+
     // Resetuje urządzenie studenta o podanym ID (używane przez nauczyciela)
     async resetStudentDevice(studentId: number) {
       this.loading = true;

@@ -70,7 +70,12 @@
     <p class="text-xl font-bold">Urządzenie zarejestrowane pomyślnie!</p>
     <p>Przejdź do skanowania objecności lub do pulpitu (wymagane logowanie).</p>
     <div class="flex flex-col gap-4 mt-4">
-      <button class="bg-green-500 border-none">Skanuj obecność</button>
+      <button
+        class="bg-green-500 border-none"
+        onclick="window.location.href='/ticket'"
+      >
+        Skanuj obecność
+      </button>
       <button
         class="bg-yellow-500 border-none"
         onclick="window.location.href='/'"

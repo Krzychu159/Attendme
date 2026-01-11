@@ -44,6 +44,11 @@ const router = createRouter({
       name: "DeviceRegister",
       component: () => import("@/pages/DeviceRegister.vue"),
     },
+    {
+      path: "/ticket",
+      name: "Ticket",
+      component: () => import("@/pages/Ticket.vue"),
+    },
   ],
 });
 

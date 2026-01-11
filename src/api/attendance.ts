@@ -29,3 +29,17 @@ export async function getScannerToken(sessionId: number) {
   });
   return res.data;
 }
+
+// Pobiera ticket (token do QR) dla zarejestrowanego urządzenia
+export async function getAttendanceTicket() {
+  const res = await api.get("/user/attendance/ticket/get", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("deviceToken")}`,
+    },
+  });
+
+  return res.data as {
+    token: string;
+    expires: string;
+  };
+}
