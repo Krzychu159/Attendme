@@ -45,6 +45,11 @@ const paused = ref(false);
 const courseSessionId = Number(route.params.sessionId);
 
 onMounted(() => {
+  if (!Number.isFinite(courseSessionId)) {
+    scanner.cameraError = "Nieprawidłowy identyfikator sesji.";
+    return;
+  }
+
   scanner.initScanner(courseSessionId);
 });
 

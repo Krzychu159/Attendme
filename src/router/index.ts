@@ -35,10 +35,12 @@ const router = createRouter({
       },
     },
     {
-      path: "/scanner",
+      path: "/scanner/:sessionId",
       name: "Scanner",
       component: () => import("@/pages/Scanner.vue"),
+      meta: { requiresAuth: true },
     },
+
     {
       path: "/device/register",
       name: "DeviceRegister",
