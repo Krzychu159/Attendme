@@ -45,20 +45,50 @@ const scanner = useScannerStore()!;
 const paused = ref(false);
 let unlockTimeout: number | null = null;
 
+function extractAttenderToken(raw: string): string | null {
+  if (!raw) return null;
+
+  // jeśli to nie URL → traktujemy jako token
+  if (!raw.includes("http")) {
+    return raw.trim();
+  }
+
+  try {
+    const url = new URL(raw);
+    return url.searchParams.get("token")?.trim() ?? null;
+  } catch {
+    return null;
+  }
+}
+
 const onDetect = async (result: any) => {
   if (paused.value || !result?.[0]?.rawValue) return;
 
   paused.value = true;
 
-  // czyścimy ewentualny poprzedni timeout
   if (unlockTimeout) {
     clearTimeout(unlockTimeout);
     unlockTimeout = null;
   }
 
-  await scanner.scanQr(result[0].rawValue);
+  const raw = result[0].rawValue;
+  const token = extractAttenderToken(raw);
 
-  // JEDYNE miejsce kontroli czasu
+  if (!token) {
+    scanner.message = "Nieprawidłowy kod QR.";
+    scanner.messageType = "error";
+
+    unlockTimeout = window.setTimeout(() => {
+      paused.value = false;
+      scanner.clearMessage();
+      unlockTimeout = null;
+    }, 2000);
+
+    return;
+  }
+
+  await scanner.scanQr(token);
+
   unlockTimeout = window.setTimeout(() => {
     paused.value = false;
     scanner.clearMessage();
