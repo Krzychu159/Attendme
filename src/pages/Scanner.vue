@@ -39,7 +39,7 @@
 import { ref } from "vue";
 import { useScannerStore } from "@/store/scanner";
 
-const scanner = useScannerStore();
+const scanner = useScannerStore()!; // ⬅️ TO JEST FIX
 const paused = ref(false);
 
 const onDetect = async (result: any) => {
