@@ -6,9 +6,9 @@
       class="relative w-full max-w-md aspect-square bg-black rounded-xl overflow-hidden"
     >
       <qrcode-stream
+        :key="scannerKey"
         @init="onInit"
         @detect="onDetect"
-        :paused="paused"
         :constraints="{ facingMode: 'environment' }"
         class="absolute inset-0 w-full h-full object-cover"
       />
@@ -21,7 +21,7 @@
         {{ scanner.cameraError }}
       </div>
 
-      <!-- komunikat po skanie -->
+      <!-- komunikat -->
       <div
         v-if="scanner.message"
         class="absolute bottom-4 left-4 right-4 text-center text-white p-3 rounded-xl text-lg font-semibold pointer-events-none"
@@ -42,16 +42,13 @@ import { ref } from "vue";
 import { useScannerStore } from "@/store/scanner";
 
 const scanner = useScannerStore()!;
-const paused = ref(false);
-let unlockTimeout: number | null = null;
+const scannerKey = ref(0);
+let resetTimeout: number | null = null;
 
 function extractAttenderToken(raw: string): string | null {
   if (!raw) return null;
 
-  // jeśli to nie URL → traktujemy jako token
-  if (!raw.includes("http")) {
-    return raw.trim();
-  }
+  if (!raw.includes("http")) return raw.trim();
 
   try {
     const url = new URL(raw);
@@ -62,14 +59,7 @@ function extractAttenderToken(raw: string): string | null {
 }
 
 const onDetect = async (result: any) => {
-  if (paused.value || !result?.[0]?.rawValue) return;
-
-  paused.value = true;
-
-  if (unlockTimeout) {
-    clearTimeout(unlockTimeout);
-    unlockTimeout = null;
-  }
+  if (!result?.[0]?.rawValue) return;
 
   const raw = result[0].rawValue;
   const token = extractAttenderToken(raw);
@@ -77,22 +67,17 @@ const onDetect = async (result: any) => {
   if (!token) {
     scanner.message = "Nieprawidłowy kod QR.";
     scanner.messageType = "error";
-
-    unlockTimeout = window.setTimeout(() => {
-      paused.value = false;
-      scanner.clearMessage();
-      unlockTimeout = null;
-    }, 2000);
-
-    return;
+  } else {
+    await scanner.scanQr(token);
   }
 
-  await scanner.scanQr(token);
+  // 🔥 PEWNY reset kamery
+  if (resetTimeout) clearTimeout(resetTimeout);
 
-  unlockTimeout = window.setTimeout(() => {
-    paused.value = false;
+  resetTimeout = window.setTimeout(() => {
     scanner.clearMessage();
-    unlockTimeout = null;
+    scannerKey.value++; // ⬅️ restart qrcode-stream
+    resetTimeout = null;
   }, 3000);
 };
 
@@ -100,7 +85,6 @@ const onInit = async (promise: Promise<void>) => {
   try {
     await promise;
     scanner.cameraError = "";
-    paused.value = false;
   } catch {
     scanner.cameraError = "Nie udało się uzyskać dostępu do kamery.";
   }
