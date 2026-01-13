@@ -13,6 +13,7 @@
         class="absolute inset-0 w-full h-full object-cover"
       />
 
+      <!-- błąd kamery -->
       <div
         v-if="scanner.cameraError"
         class="absolute inset-0 flex items-center justify-center text-center text-white p-4 rounded-xl bg-red-600"
@@ -20,6 +21,7 @@
         {{ scanner.cameraError }}
       </div>
 
+      <!-- komunikat po skanie -->
       <div
         v-if="scanner.message"
         class="absolute bottom-4 left-4 right-4 text-center text-white p-3 rounded-xl text-lg font-semibold pointer-events-none"
@@ -39,21 +41,29 @@
 import { ref } from "vue";
 import { useScannerStore } from "@/store/scanner";
 
-const scanner = useScannerStore()!; // ⬅️ TO JEST FIX
+const scanner = useScannerStore()!;
 const paused = ref(false);
+let unlockTimeout: number | null = null;
 
 const onDetect = async (result: any) => {
   if (paused.value || !result?.[0]?.rawValue) return;
 
   paused.value = true;
 
-  try {
-    await scanner.scanQr(result[0].rawValue);
-  } finally {
-    setTimeout(() => {
-      paused.value = false;
-    }, 3000);
+  // czyścimy ewentualny poprzedni timeout
+  if (unlockTimeout) {
+    clearTimeout(unlockTimeout);
+    unlockTimeout = null;
   }
+
+  await scanner.scanQr(result[0].rawValue);
+
+  // JEDYNE miejsce kontroli czasu
+  unlockTimeout = window.setTimeout(() => {
+    paused.value = false;
+    scanner.clearMessage();
+    unlockTimeout = null;
+  }, 3000);
 };
 
 const onInit = async (promise: Promise<void>) => {

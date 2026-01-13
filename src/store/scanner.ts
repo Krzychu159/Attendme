@@ -28,11 +28,12 @@ export const useScannerStore = defineStore("scanner", {
         this.messageType = "error";
       } finally {
         this.loading = false;
-        setTimeout(() => {
-          this.message = "";
-          this.messageType = "";
-        }, 3000);
       }
+    },
+
+    clearMessage() {
+      this.message = "";
+      this.messageType = "";
     },
   },
 });
