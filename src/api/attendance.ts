@@ -27,10 +27,9 @@ export async function getScannerToken(sessionId: number) {
   const res = await api.get("/course/session/attendance/scanner/token/get", {
     params: { sessionId },
   });
-  return res.data;
+  return res.data as { token: string; expires?: string };
 }
 
-// Pobiera ticket (token do QR) dla zarejestrowanego urządzenia
 export async function getAttendanceTicket() {
   const res = await api.get("/user/attendance/ticket/get", {
     headers: {
@@ -44,11 +43,19 @@ export async function getAttendanceTicket() {
   };
 }
 
-// Rejestracja obecności po zeskanowaniu QR
-export async function registerAttendance(attenderToken: string) {
-  const res = await api.post("/course/session/attendance/register", {
-    attenderToken,
-  });
+export async function registerAttendance(
+  attenderToken: string,
+  scannerToken: string
+) {
+  const res = await api.post(
+    "/course/session/attendance/register",
+    { attenderToken },
+    {
+      headers: {
+        Authorization: `Bearer ${scannerToken}`,
+      },
+    }
+  );
 
-  return res.data; // User
+  return res.data;
 }

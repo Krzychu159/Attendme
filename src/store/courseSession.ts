@@ -13,6 +13,7 @@ export const useCourseSessionStore = defineStore("courseSession", {
     error: null as string | null,
     qrUrl: null as string | null,
     url: null as string | null,
+    scannerToken: null as string | null,
   }),
 
   actions: {
@@ -40,7 +41,7 @@ export const useCourseSessionStore = defineStore("courseSession", {
       try {
         const data = await getSessionAttendanceList(sessionId);
         this.students = Array.isArray(data) ? data : [];
-      } catch (e) {
+      } catch {
         this.error = "Nie udało się pobrać listy obecności";
       } finally {
         this.loading = false;
@@ -51,6 +52,9 @@ export const useCourseSessionStore = defineStore("courseSession", {
       this.session = null;
       this.students = [];
       this.error = null;
+      this.qrUrl = null;
+      this.url = null;
+      this.scannerToken = null;
     },
 
     async toogleAttendance(
@@ -68,8 +72,9 @@ export const useCourseSessionStore = defineStore("courseSession", {
           (s) => s.attenderUserId === studentId
         );
         if (!student) return;
+
         student.wasUserPresent = addOrRemove;
-      } catch (e) {
+      } catch {
         this.error = "Nie udało się zaktualizować obecności studenta";
       } finally {
         this.loading = false;
@@ -77,23 +82,31 @@ export const useCourseSessionStore = defineStore("courseSession", {
     },
 
     async generateQrForSession() {
-      if (!this.session) {
+      if (!this.session?.courseSessionId) {
         this.error = "Brak sesji do wygenerowania QR kodu.";
-        return null;
+        return;
       }
+
       try {
         this.loading = true;
         this.error = null;
 
         const tokenData = await getScannerToken(this.session.courseSessionId);
+        this.scannerToken = tokenData?.token ?? null;
 
-        const url = `${window.location.origin}/scanner?token=${tokenData.token}`;
+        if (!this.scannerToken) {
+          this.error = "Nie udało się pobrać tokenu skanera.";
+          return;
+        }
 
-        this.qrUrl = await QRCode.toDataURL(url);
+        const url = `${window.location.origin}/scanner?token=${encodeURIComponent(
+          this.scannerToken
+        )}`;
+
         this.url = url;
-      } catch (e) {
+        this.qrUrl = await QRCode.toDataURL(url, { margin: 1, width: 256 });
+      } catch {
         this.error = "Nie udało się wygenerować QR kodu.";
-        return null;
       } finally {
         this.loading = false;
       }

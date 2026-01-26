@@ -46,14 +46,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
 import { useScannerStore } from "@/store/scanner";
 
+const route = useRoute();
 const scanner = useScannerStore();
+
 const paused = ref(false);
 let resetTimeout: number | null = null;
 
-function extractAttenderToken(raw: string): string | null {
+function extractToken(raw: string): string | null {
   if (!raw) return null;
   if (!raw.includes("http")) return raw.trim();
 
@@ -65,6 +68,16 @@ function extractAttenderToken(raw: string): string | null {
   }
 }
 
+onMounted(() => {
+  const scannerToken = (route.query.token as string | undefined) ?? "";
+  scanner.setScannerToken(scannerToken);
+
+  if (!scannerToken) {
+    scanner.message = "Brak tokenu skanera w adresie URL.";
+    scanner.messageType = "error";
+  }
+});
+
 const onDetect = async (detectedCodes: any[]) => {
   if (paused.value) return;
 
@@ -73,13 +86,13 @@ const onDetect = async (detectedCodes: any[]) => {
 
   paused.value = true;
 
-  const token = extractAttenderToken(raw);
+  const attenderToken = extractToken(raw);
 
-  if (!token) {
+  if (!attenderToken) {
     scanner.message = "Nieprawidłowy kod QR.";
     scanner.messageType = "error";
   } else {
-    await scanner.scanQr(token);
+    await scanner.scanQr(attenderToken);
   }
 
   if (resetTimeout) clearTimeout(resetTimeout);
