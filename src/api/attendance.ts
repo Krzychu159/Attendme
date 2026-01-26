@@ -51,9 +51,11 @@ export async function registerAttendance(
   const res = await axios.get(
     "https://attendme-backend.runasp.net/course/session/attendance/register",
     {
-      params: { attenderToken },
+      params: { attenderToken, scannerToken }, // test
       headers: {
-        Authorization: `Bearer ${scannerToken}`,
+        Authorization: `Bearer ${scannerToken}`, // test
+        "X-Device-Token": scannerToken, // test
+        "X-Scanner-Token": scannerToken, // test
       },
     }
   );
