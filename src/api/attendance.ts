@@ -47,15 +47,12 @@ export async function registerAttendance(
   attenderToken: string,
   scannerToken: string
 ) {
-  const res = await api.post(
-    "/course/session/attendance/register",
-    { attenderToken },
-    {
-      headers: {
-        Authorization: `Bearer ${scannerToken}`,
-      },
-    }
-  );
+  const res = await api.get("/course/session/attendance/register", {
+    params: { attenderToken },
+    headers: {
+      Authorization: `Bearer ${scannerToken}`,
+    },
+  });
 
   return res.data;
 }
