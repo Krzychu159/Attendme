@@ -43,6 +43,19 @@
         @GitHub
       </a>
     </div>
+
+    <!-- Overlay loader -->
+    <div
+      v-if="loading"
+      class="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl px-6 py-4 shadow flex items-center gap-3">
+        <div
+          class="w-6 h-6 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"
+        />
+        <span class="text-sm text-gray-700">Logowanie...</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,9 +69,11 @@ const password = ref("");
 const error = ref("");
 const auth = useAuthStore();
 const router = useRouter();
+const loading = ref(false);
 
 async function handleLogin() {
   try {
+    loading.value = true;
     await auth.login(loginName.value, password.value);
 
     if (auth.role === "teacher") router.push("/teacher");
@@ -66,6 +81,8 @@ async function handleLogin() {
   } catch (err) {
     console.error(err);
     error.value = "Błąd logowania — sprawdź dane lub połączenie.";
+  } finally {
+    loading.value = false;
   }
 }
 </script>

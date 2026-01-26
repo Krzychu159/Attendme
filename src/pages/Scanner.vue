@@ -71,12 +71,11 @@ const onDetect = async (result: any) => {
     await scanner.scanQr(token);
   }
 
-  // 🔥 PEWNY reset kamery
   if (resetTimeout) clearTimeout(resetTimeout);
 
   resetTimeout = window.setTimeout(() => {
     scanner.clearMessage();
-    scannerKey.value++; // ⬅️ restart qrcode-stream
+    scannerKey.value++;
     resetTimeout = null;
   }, 3000);
 };

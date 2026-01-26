@@ -36,11 +36,17 @@
             attendanceStore.status === "Present"
               ? "Obecny"
               : attendanceStore.status === "Absent"
-              ? "Nieobecny"
-              : "Brak danych"
+                ? "Nieobecny"
+                : "Brak danych"
           }}
         </div>
       </div>
+      <button
+        class="px-4 bg-blue-500 text-white hover:bg-blue-600 transition py-3 rounded-xl font-semibold w-fit"
+        @click="refreshPage"
+      >
+        Odśwież
+      </button>
     </div>
   </div>
 
@@ -89,6 +95,12 @@ const auth = useAuthStore();
 
 const { session } = storeToRefs(courseSessionStore);
 const attendanceStore = useAttendanceStore();
+
+const refreshPage = async () => {
+  await coursesStore.fetchCourses();
+  trySetSessionFromCourses();
+  await attendanceStore.fetchAttendance(props.sessionId, props.groupId);
+};
 
 const trySetSessionFromCourses = () => {
   const found = coursesStore.courses.find(

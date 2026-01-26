@@ -50,7 +50,7 @@ export const useAttendanceStore = defineStore("attendance", {
 
         this.status = found ? "Present" : "Absent";
       } catch (err: any) {
-        console.error("❌ Błądd pobierania obecności:", err);
+        console.error(" Błąd pobierania obecności:", err);
         this.error = "Nie udało się pobrać obecności.";
       } finally {
         this.loading = false;
@@ -67,9 +67,9 @@ export const useAttendanceStore = defineStore("attendance", {
         this.ticket = res.token;
         this.ticketExpires = res.expires;
       } catch (err: any) {
-        console.error("❌ Błądddsdsdsda pobierania ticketu:", err);
+        console.error("Błądddsds pobierania ticketu:", err);
 
-        // 🔥 token urządzenia nieważny / zresetowany
+        //  token urządzenia nieważny / zresetowany
         if (err.response?.status === 401) {
           localStorage.removeItem("deviceToken");
           this.ticket = null;
