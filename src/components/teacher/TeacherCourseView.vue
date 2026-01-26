@@ -31,6 +31,7 @@
         <button @click="openRegister = !openRegister">
           Rejestracja urządzenia
         </button>
+        <button @click="refreshPage">Odśwież</button>
       </div>
     </div>
 
@@ -249,6 +250,13 @@ const didPrefetch = ref(false);
 const openRegister = ref(false);
 const openScanner = ref(false);
 
+const refreshPage = () => {
+  if (props.sessionId) {
+    store.setSessionFromTeacherCourses(props.sessionId, props.groupId);
+    store.fetchAttendanceList(props.sessionId);
+  }
+};
+
 const toogleAttendance = (
   studentId: number,
   courseSessionId: number,
@@ -263,9 +271,9 @@ const resetDevice = async (studentId: number) => {
     if (userStore.userInfos[studentId]) {
       userStore.userInfos[studentId].deviceName = null;
     }
-    alert("✅ Urządzenie zostało zresetowane pomyślnie.");
+    alert(" Urządzenie zostało zresetowane pomyślnie.");
   } catch (err) {
-    alert("❌ Nie udało się zresetować urządzenia.");
+    alert(" Nie udało się zresetować urządzenia.");
   }
 };
 

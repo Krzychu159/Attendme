@@ -6,14 +6,14 @@
       class="relative w-full max-w-md aspect-square bg-black rounded-xl overflow-hidden"
     >
       <qrcode-stream
-        :key="scannerKey"
-        @init="onInit"
-        @detect="onDetect"
+        :paused="paused"
         :constraints="{ facingMode: 'environment' }"
+        @detect="onDetect"
+        @camera-on="onCameraOn"
+        @error="onCameraError"
         class="absolute inset-0 w-full h-full object-cover"
       />
 
-      <!-- błąd kamery -->
       <div
         v-if="scanner.cameraError"
         class="absolute inset-0 flex items-center justify-center text-center text-white p-4 rounded-xl bg-red-600"
@@ -21,7 +21,6 @@
         {{ scanner.cameraError }}
       </div>
 
-      <!-- komunikat -->
       <div
         v-if="scanner.message"
         class="absolute bottom-4 left-4 right-4 text-center text-white p-3 rounded-xl text-lg font-semibold pointer-events-none"
@@ -31,6 +30,15 @@
       >
         {{ scanner.message }}
       </div>
+
+      <div
+        v-if="scanner.loading"
+        class="absolute inset-0 flex items-center justify-center bg-black/40 text-white"
+      >
+        <div
+          class="w-8 h-8 border-4 border-white/40 border-t-white rounded-full animate-spin"
+        ></div>
+      </div>
     </div>
 
     <div class="text-center text-sm">Zbliż kod QR do kamery.</div>
@@ -38,16 +46,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onUnmounted } from "vue";
 import { useScannerStore } from "@/store/scanner";
 
-const scanner = useScannerStore()!;
-const scannerKey = ref(0);
+const scanner = useScannerStore();
+const paused = ref(false);
 let resetTimeout: number | null = null;
 
 function extractAttenderToken(raw: string): string | null {
   if (!raw) return null;
-
   if (!raw.includes("http")) return raw.trim();
 
   try {
@@ -58,10 +65,14 @@ function extractAttenderToken(raw: string): string | null {
   }
 }
 
-const onDetect = async (result: any) => {
-  if (!result?.[0]?.rawValue) return;
+const onDetect = async (detectedCodes: any[]) => {
+  if (paused.value) return;
 
-  const raw = result[0].rawValue;
+  const raw = detectedCodes?.[0]?.rawValue;
+  if (!raw) return;
+
+  paused.value = true;
+
   const token = extractAttenderToken(raw);
 
   if (!token) {
@@ -75,17 +86,27 @@ const onDetect = async (result: any) => {
 
   resetTimeout = window.setTimeout(() => {
     scanner.clearMessage();
-    scannerKey.value++;
+    paused.value = false;
     resetTimeout = null;
   }, 3000);
 };
 
-const onInit = async (promise: Promise<void>) => {
+const onCameraOn = async (
+  capabilitiesPromise: Promise<MediaTrackCapabilities>
+) => {
   try {
-    await promise;
+    await capabilitiesPromise;
     scanner.cameraError = "";
   } catch {
-    scanner.cameraError = "Nie udało się uzyskać dostępu do kamery.";
+    scanner.cameraError = "Nie udało się uruchomić kamery.";
   }
 };
+
+const onCameraError = () => {
+  scanner.cameraError = "Nie udało się uzyskać dostępu do kamery.";
+};
+
+onUnmounted(() => {
+  if (resetTimeout) clearTimeout(resetTimeout);
+});
 </script>

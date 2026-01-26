@@ -11,6 +11,12 @@ export const useScannerStore = defineStore("scanner", {
 
   actions: {
     async scanQr(attenderToken: string) {
+      if (!attenderToken) {
+        this.message = "Nieprawidłowy kod QR.";
+        this.messageType = "error";
+        return;
+      }
+
       this.loading = true;
 
       try {
@@ -18,11 +24,11 @@ export const useScannerStore = defineStore("scanner", {
         this.message = `Obecność zarejestrowana: ${user.name} ${user.surname}`;
         this.messageType = "success";
       } catch (err: any) {
-        if (err.response?.status === 409) {
+        if (err?.response?.status === 409) {
           this.message = "Ten student ma już zarejestrowaną obecność.";
         } else {
           this.message =
-            err.response?.data?.detail ||
+            err?.response?.data?.detail ||
             "Nie udało się zarejestrować obecności.";
         }
         this.messageType = "error";
