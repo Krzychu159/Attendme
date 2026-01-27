@@ -20,7 +20,7 @@ export const useDeviceStore = defineStore("device", {
 
       try {
         const results = await Promise.allSettled(
-          ids.map((id) => getDeviceToken(id))
+          ids.map((id) => getDeviceToken(id)),
         );
 
         results.forEach((res, i) => {
@@ -43,7 +43,7 @@ export const useDeviceStore = defineStore("device", {
         studentName: string;
         studentSurname: string;
         albumIdNumber: number;
-      }
+      },
     ) {
       this.loading = true;
       this.error = null;
@@ -81,7 +81,7 @@ export const useDeviceStore = defineStore("device", {
 
         await resetDevice(Number(deviceUserId));
 
-        // 🔹 Czyścimy wszystko lokalnie
+        //  Czyścimy wszystko lokalnie
         localStorage.removeItem("deviceToken");
         localStorage.removeItem("deviceUserId");
         localStorage.removeItem("deviceRegistered");
@@ -93,7 +93,7 @@ export const useDeviceStore = defineStore("device", {
       }
     },
 
-    // Resetuje urządzenie studenta o podanym ID (używane przez nauczyciela)
+    // Resetujemy urządzenie studenta o podanym ID (używane przez nauczyciela)
     async resetStudentDevice(studentId: number) {
       this.loading = true;
       this.error = null;
@@ -101,7 +101,7 @@ export const useDeviceStore = defineStore("device", {
       try {
         await resetDevice(studentId);
 
-        // 🔹 Po sukcesie usuń token z lokalnego cache (żeby tabela się odświeżyła)
+        //  Po sukcesie usuwamy token z lokalnego cache (żeby tabela się odświeżyła)
         delete this.deviceTokens[studentId];
       } catch (e) {
         console.error("Błąd resetowania urządzenia:", e);
