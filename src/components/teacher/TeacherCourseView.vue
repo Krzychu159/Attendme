@@ -157,7 +157,7 @@
           <button
             v-if="!store.qrUrl"
             class="bg-blue-500 text-white px-4 py-2 rounded"
-            @click="store.generateQrForSession()"
+            @click="store.generateQrForSession(props.sessionId)"
           >
             Generuj QR
           </button>
@@ -200,7 +200,7 @@
                 toogleAttendance(
                   s.attenderUserId,
                   session.courseSessionId,
-                  false
+                  false,
                 )
               "
             >
@@ -213,7 +213,7 @@
                 toogleAttendance(
                   s.attenderUserId,
                   session.courseSessionId,
-                  true
+                  true,
                 )
               "
             >
@@ -260,7 +260,7 @@ const refreshPage = () => {
 const toogleAttendance = (
   studentId: number,
   courseSessionId: number,
-  addOrRemove: boolean
+  addOrRemove: boolean,
 ) => {
   store.toogleAttendance(studentId, courseSessionId, addOrRemove);
 };
@@ -286,7 +286,7 @@ watch(
     const ids = newStudents.map((s) => s.attenderUserId);
     await userStore.fetchUsersByIds(ids);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const deviceStore = useDeviceStore();
@@ -298,7 +298,7 @@ watch(
     const ids = newStudents.map((s) => s.attenderUserId);
     await deviceStore.fetchTokensByIds(ids);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const copyDeviceLink = async (student: any) => {
@@ -321,7 +321,7 @@ watch(
     store.setSessionFromTeacherCourses(id, props.groupId);
     store.fetchAttendanceList(id);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const copied = ref(false);
@@ -340,7 +340,7 @@ const copyLink = async () => {
 const formattedDate = computed(() =>
   session.value
     ? new Date(session.value.dateStart).toLocaleDateString("pl-PL")
-    : ""
+    : "",
 );
 
 const formattedStartTime = computed(() =>
@@ -349,7 +349,7 @@ const formattedStartTime = computed(() =>
         hour: "2-digit",
         minute: "2-digit",
       })
-    : ""
+    : "",
 );
 
 const formattedEndTime = computed(() =>
@@ -358,6 +358,6 @@ const formattedEndTime = computed(() =>
         hour: "2-digit",
         minute: "2-digit",
       })
-    : ""
+    : "",
 );
 </script>

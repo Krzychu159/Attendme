@@ -1,5 +1,4 @@
 import { api } from "./client";
-import axios from "axios";
 
 export async function getStudentAttendance(courseGroupId: number) {
   const res = await api.get("/course/student/attendance/get", {
@@ -24,7 +23,6 @@ export async function toogleAttendance(
   return res.data;
 }
 
-// KLUCZ: courseSessionId (nie sessionId)
 export async function getScannerToken(courseSessionId: number) {
   const res = await api.get("/course/session/attendance/scanner/token/get", {
     params: { courseSessionId },
@@ -49,15 +47,12 @@ export async function registerAttendance(
   attenderToken: string,
   scannerToken: string,
 ) {
-  const res = await axios.get(
-    "https://attendme-backend.runasp.net/course/session/attendance/register",
-    {
-      params: { attenderToken },
-      headers: {
-        Authorization: `Bearer ${scannerToken}`,
-      },
+  const res = await api.get("/course/session/attendance/register", {
+    params: { attenderToken },
+    headers: {
+      Authorization: `Bearer ${scannerToken}`,
     },
-  );
+  });
 
   return res.data;
 }
