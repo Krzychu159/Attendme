@@ -1,4 +1,5 @@
 import { api } from "./client";
+import axios from "axios";
 
 export async function getStudentAttendance(courseGroupId: number) {
   const res = await api.get("/course/student/attendance/get", {
@@ -10,7 +11,7 @@ export async function getStudentAttendance(courseGroupId: number) {
 export async function toogleAttendance(
   attendingUserId: number,
   courseSessionId: number,
-  addOrRemove: boolean
+  addOrRemove: boolean,
 ) {
   const res = await api.get("/course/session/attendance/toggle", {
     params: {
@@ -23,9 +24,10 @@ export async function toogleAttendance(
   return res.data;
 }
 
-export async function getScannerToken(sessionId: number) {
+// KLUCZ: courseSessionId (nie sessionId)
+export async function getScannerToken(courseSessionId: number) {
   const res = await api.get("/course/session/attendance/scanner/token/get", {
-    params: { sessionId },
+    params: { courseSessionId },
   });
   return res.data as { token: string; expires?: string };
 }
@@ -45,14 +47,17 @@ export async function getAttendanceTicket() {
 
 export async function registerAttendance(
   attenderToken: string,
-  scannerToken: string
+  scannerToken: string,
 ) {
-  const res = await api.get("/course/session/attendance/register", {
-    params: { attenderToken },
-    headers: {
-      Authorization: `Bearer ${scannerToken}`,
+  const res = await axios.get(
+    "https://attendme-backend.runasp.net/course/session/attendance/register",
+    {
+      params: { attenderToken },
+      headers: {
+        Authorization: `Bearer ${scannerToken}`,
+      },
     },
-  });
+  );
 
   return res.data;
 }
