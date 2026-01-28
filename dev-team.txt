@@ -1,0 +1,39 @@
+======================================================
+              PROJEKT: lab1/3/PROGN
+======================================================
+
+CZŁONKOWIE ZESPOŁU:
+- Krzysztof Rak (15195)
+- Szymon Gorzula (15494)
+
+------------------------------------------------------
+KRZYSZTOF RAK (15195)
+------------------------------------------------------
+
+Zakres prac:
+- Implementacja logiki aplikacji odpowiedzialnej za zarządzanie sesjami i obecnościami.
+- Integracja frontendu z backendem (obsługa zapytań API: rejestracja urządzeń, generowanie tokenów,
+  resetowanie urządzeń, pobieranie sesji).
+- Opracowanie i konfiguracja store’ów w Pinia (useDeviceStore, useCourseSessionStore, useUserStore).
+- Stworzenie logiki dla funkcji skanera QR oraz komponentów do obsługi sesji nauczyciela
+  (panel zajęć, skaner obecności, rejestracja urządzenia).
+- Implementacja mechanizmu zapisu i odczytu danych urządzenia w localStorage.
+- Debugowanie aplikacji i testowanie integracji front–backend (obsługa błędów 403, tokenów,
+  odświeżanie danych).
+- Dopracowanie interfejsu użytkownika pod kątem funkcjonalności i spójności działania.
+
+------------------------------------------------------
+SZYMON GORZULA (15494)
+------------------------------------------------------
+
+Zakres prac:
+- Opracowanie i implementacja interfejsów użytkownika (DeviceRegister.vue, formularze,
+  komunikaty o błędach i sukcesie).
+- Stylizacja widoków z użyciem Tailwind CSS i dopasowanie layoutu aplikacji do różnych rozdzielczości.
+- Integracja formularzy z logiką aplikacji – obsługa zdarzeń (v-model, @submit, watch)
+  oraz walidacja danych wejściowych.
+- Współtworzenie logiki powiązanej z rejestracją urządzenia i zapisem danych lokalnie.
+- Testowanie działania interfejsu i współpraca przy korektach UX/UI.
+- Pomoc przy obsłudze błędów, stanów ładowania oraz komunikacji między komponentami a store’ami.
+
+
